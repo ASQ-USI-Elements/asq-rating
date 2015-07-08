@@ -1,10 +1,9 @@
 {
   "name": "asq-rating",
-  "version": "0.0.0",
-  "homepage": "https://github.com/ASQ-USI/asq-rating",
+  "version": "0.1.0",
+  "homepage": "https://github.com/ASQ-USI-Elements/asq-rating",
   "authors": [
-    "Vasileios Triglianos <triglian@gmail.com>",
-    "Zhenfei Nie <zhenfei.nie@gmail.com>"
+    "Vasileios Triglianos <triglian@gmail.com>"
   ],
   "description": "ASQ rating question element",
   "keywords": [
@@ -13,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "polymer": "Polymer/polymer#^0.5.1",
-    "asq-base": "ASQ-USI/asq-base#master",
+    "asq-base": "ASQ-USI-Elements/asq-base#master",
     "test-fixture": "Polymer/test-fixture#~0.2.0"
   },
   "devDependencies": {
