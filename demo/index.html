@@ -3,14 +3,14 @@
 <head>
   <meta name="asq-elements" content="width=device-width, initial-scale=1, user-scalable=no">
 
-  <title>ASQ | Rating</title>
+  <title>asq-rating-q Demo</title>
 
-  <script src="..//webcomponentsjs/webcomponents.js"></script>
+  <script src="../..//webcomponentsjs/webcomponents.js"></script>
   
-  <link href="asq-rating.html" rel="import">
-  <link href="../asq-stem/asq-stem.html" rel="import">
+  <link href="../asq-rating-q.html" rel="import">
+  <link href="../../asq-stem/asq-stem.html" rel="import">
 
-  <style shim-shadowdom>
+  <style>
     body {
       font-family: 'Helvetica Neue', Helvetica, Arial;
       font-size: 14px;
@@ -31,42 +31,18 @@
 </head>
 <body>
 
-<template is="auto-binding">
-
   <section>
 
-    <asq-rating type="stars">
+    <asq-rating-q type="stars">
       <asq-stem><h3>An asq-rating question.</h3></asq-stem>
       <asq-rating-item name="item-1">Item to rate #1</asq-rating-item>
       <asq-rating-item name="item-2">Item to rate #2</asq-rating-item>
       <asq-rating-item name="item-3">Item to rate #3</asq-rating-item>
       <asq-rating-item rating="3" disabled name="item-4">Item to rate #4 (disabled)</asq-rating-item>
-    </asq-rating>
+    </asq-rating-q>
 
   </section>
 
-  <script>
-  window.onmessage = function(e){
-    if (typeof e.data.role == "string" && e.data.role.length > 0) {
-      var allAsqElements = document.querySelectorAll('html /deep/ *');
-      allAsqElements = Array.prototype.slice.call(allAsqElements).filter(function(el) {
-        return isASQEl(el);
-      });
-
-      //set role for every asq-element in this page
-      allAsqElements.forEach(function(elem, index) {
-        elem.role = e.data.role;
-      });
-    }
-
-    function isASQEl(el) {
-      return el.localName.indexOf('asq-') != -1;
-    } 
-  };
-</script>
-
-
-</template>
 
 </body>
 </html>

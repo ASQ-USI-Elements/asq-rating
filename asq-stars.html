@@ -22,77 +22,80 @@
   font-style: normal;
 }
 </style>
-<polymer-element name="asq-stars" attributes="name rating disabled">
+<dom-module id="asq-stars">
+  <link rel="import" type="css" href="./asq-stars.css">
   <template>
-    <link rel="stylesheet" href="./asq-stars.css" type="text/css" />
     
-    <fieldset id="rating" on-tap="{{onTap}}">
-      <input type="radio" disabled?="{{disabled}}" id="star5" name="{{name}}" value="5" /><label class = "full" for="star5" title="Excellent - 5 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star4half" name="{{name}}" value="4.5" /><label class="half" for="star4half" title="Very good - 4.5 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star4" name="{{name}}" value="4" /><label class = "full" for="star4" title="Very good - 4 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star3half" name="{{name}}" value="3.5" /><label class="half" for="star3half" title="Good - 3.5 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star3" name="{{name}}" value="3" /><label class = "full" for="star3" title="Fine - 3 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star2half" name="{{name}}" value="2.5" /><label class="half" for="star2half" title="Poor - 2.5 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star2" name="{{name}}" value="2" /><label class = "full" for="star2" title="Poor - 2 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star1half" name="{{name}}" value="1.5" /><label class="half" for="star1half" title="Very poor - 1.5 stars"></label>
-      <input type="radio" disabled?="{{disabled}}" id="star1" name="{{name}}" value="1" /><label class = "full" for="star1" title="Very poor - 1 star"></label>
-      <input type="radio" disabled?="{{disabled}}" id="starhalf" name="{{name}}" value="0.5" /><label class="half" for="starhalf" title="terrible - 0.5 stars"></label>
+    <fieldset id="rating" on-tap="onTap">
+      <input type="radio" id="star5" name="{{name}}" value="5" disabled$="{{disabled}}"><label class="full" for="star5" title="Excellent - 5 stars"></label>
+      <input type="radio" id="star4half" name="{{name}}" value="4.5" disabled$="{{disabled}}"><label class="half" for="star4half" title="Very good - 4.5 stars"></label>
+      <input type="radio" id="star4" name="{{name}}" value="4" disabled$="{{disabled}}"><label class="full" for="star4" title="Very good - 4 stars"></label>
+      <input type="radio" id="star3half" name="{{name}}" value="3.5" disabled$="{{disabled}}"><label class="half" for="star3half" title="Good - 3.5 stars"></label>
+      <input type="radio" id="star3" name="{{name}}" value="3" disabled$="{{disabled}}"><label class="full" for="star3" title="Fine - 3 stars"></label>
+      <input type="radio" id="star2half" name="{{name}}" value="2.5" disabled$="{{disabled}}"><label class="half" for="star2half" title="Poor - 2.5 stars"></label>
+      <input type="radio" id="star2" name="{{name}}" value="2" disabled$="{{disabled}}"><label class="full" for="star2" title="Poor - 2 stars"></label>
+      <input type="radio" id="star1half" name="{{name}}" value="1.5" disabled$="{{disabled}}"><label class="half" for="star1half" title="Very poor - 1.5 stars"></label>
+      <input type="radio" id="star1" name="{{name}}" value="1" disabled$="{{disabled}}"><label class="full" for="star1" title="Very poor - 1 star"></label>
+      <input type="radio" id="starhalf" name="{{name}}" value="0.5" disabled$="{{disabled}}"><label class="half" for="starhalf" title="terrible - 0.5 stars"></label>
     </fieldset>
   </template>
-
   <script>
-    (function() {
+    (function () {
+      Polymer({
+        is: 'asq-stars',
 
-      var p = {
+        behaviors: [ASQ.asqElementBehavior],
 
-        publish: {
-          /**
-           * `name` attribute used by each `input type="radio"` that represents a star. It is needed to group them.
-           * @attribute name
-           * @type string
-           * @default ''
-           */
-          name: {value: '', reflect: true},
-
-          /**
-           * A number from reflecting the stars. It should be between 0 and 5. It doesn't have to a multiple of 0.5
-           * @attribute rating
-           * @type number
-           * @default 0
-           */
-          rating: {value: 0, reflect: true},
-
+        properties: {
           /**
            * If true, the user cannot interact with this element.
-           * @attribute disabled
-           * @type boolean
-           * @default false
            */
-          disabled: {value: false, reflect: true},
+          disabled: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            reflectToAttribute: true
+          },
+          /**
+           * `name` attribute used by each `input type="radio"` that represents a star. It is needed to group them.
+           */
+          name: {
+            type: String,
+            value: '',
+            notify: true,
+            reflectToAttribute: true
+          },
+          /**
+           * A number from reflecting the stars. It should be between 0 and 5. It doesn't have to a multiple of 0.5
+           */
+          rating: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: 'ratingChanged',
+            reflectToAttribute: true
+          }
         },
 
-        ratingChanged: function(oldRating, newRating){
+        ratingChanged: function (newRating, oldRating) {
           var newRating = parseFloat(newRating);
-          if (! newRating){
+          if (newRating < 0 || newRating > 5) {
             this.rating = oldRating;
             return;
           }
-
-          if (newRating < 0 || newRating > 5){
-            console.log('`rating` should be a number between 0 and 5')
+          if (newRating < 0 || newRating > 5) {
+            console.log('`rating` should be a number between 0 and 5');
             this.rating = oldRating;
             return;
           }
-
           this.setStarsFromRating(this.rating);
         },
-
-        onTap: function(event, detail, sender){
-          if(this.disabled) return;
-          console.log(this)
+        onTap: function (event, detail, sender) {
+          if (this.disabled)
+            return;
+          console.log(this);
           this.rating = this.getRatingFromStars();
         },
-
         /**
          * Returns the sum of all `:checked` stars (0.5 for each star).
          * 
@@ -100,16 +103,15 @@
          * @return {number} The sum of all :checked stars (0.5 for each star).
          */
         getRatingFromStars: function () {
-          var stars = this.$.rating.querySelectorAll("input[type=radio]");
-          for (var i=0; i<stars.length; i++) {
+          var stars = Polymer.dom(this.$.rating).querySelectorAll('input[type=radio]');
+          for (var i = 0; i < stars.length; i++) {
             var star = stars[i];
-            if ( star.checked == true ) {
+            if (star.checked == true) {
               return parseFloat(star.value);
             }
           }
-          return 0;      
+          return 0;
         },
-
         /**
          * Sets `number` :checked stars (with half a star interval
          * 
@@ -117,26 +119,19 @@
          * @param {number} rating How many stars to set
          * 
          */
-        setStarsFromRating: function(rating) {
-          var stars = this.$.rating.querySelectorAll("input[type=radio]").array().reverse();
-
-          for ( var i=0; i<stars.length; i++ ) {
+        setStarsFromRating: function (rating) {
+          var stars = Polymer.dom(this.$.rating).querySelectorAll('input[type=radio]').reverse();
+          for (var i = 0; i < stars.length; i++) {
             stars[i].checked = false;
           }
-
           //we have halfs so duplicate
-          rating = Math.floor(2 * rating)
-          rating = rating > stars.length 
-            ? stars.length 
-            : rating;
-          for ( var i=0; i<rating; i++ ) {
+          rating = Math.floor(2 * rating);
+          rating = rating > stars.length ? stars.length : rating;
+          for (var i = 0; i < rating; i++) {
             stars[i].checked = true;
           }
         }
-      }
-
-      ASQ.asqify(p);
-      Polymer('asq-stars', p);
-    })();
+      });
+    }());
   </script>
-</polymer-element>
+</dom-module>

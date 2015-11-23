@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../asq-base/asq-base.html">
 <link rel="import" href="./asq-stars.html">
-
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
 
 <!--
@@ -14,50 +14,53 @@
 @group ASQ Elements
 @blurb Element defining items to rate. Internally it uses other elements depending on the rating `type`. Right now, only `<asq-stars>` is supported
 -->
-<polymer-element name="asq-rating-item" attributes="type name rating disabled">
-  <template>
-    <style>
+<dom-module id="asq-rating-item">
+  <style>
     :host{
       display:block;
+    }
+
+    #container{
+      @apply(--layout-horizontal)
     }
 
     #container > *{ margin-right: 5px; }    
     #container > :last-child{ margin-right: 0; }
 
     </style>
+  <template>
 
     <!-- template for viewer -->
-    <template if="{{role==roles.VIEWER}}">
-      <div id="container" layout horizontal>
+    <template is="dom-if" if="{{hasRole(role, roles.VIEWER)}}">
+      <div id="container">
         <div id="content"><content></content></div>
-        <template  if="{{type=='stars'}}">
-          <asq-stars name="{{name}}" rating="{{rating}}" disabled?="{{disabled}}"></asq-stars> <div> {{truncatedRating}}</div>
+        <template is="dom-if" if="{{_hasTypeStars(type)}}">
+          <asq-stars name="{{name}}" rating="{{rating}}" disabled$="{{disabled}}"></asq-stars> <div> <span>{{truncatedRating}}</span></div>
         </template> 
       </div>
     </template>
     
 
     <!-- template for presenter -->
-    <template  if="{{role==roles.PRESENTER}}">
-      <div id="container" layout horizontal>
+    <template is="dom-if"  if="{{hasRole(role, roles.PRESENTER)}}">
+      <div id="container">
         <div id="content"><content></content></div>
-        <template  if="{{type=='stars'}}">
-          <asq-stars name="{{name}}" rating="{{rating}}" disabled?="{{disabled}}"></asq-stars> <div> {{truncatedRating}}</div>
+        <template is="dom-if" if="{{_hasTypeStars(type)}}">
+          <asq-stars name="{{name}}" rating="{{rating}}" disabled$="{{disabled}}"></asq-stars> <div> <span>{{truncatedRating}}</span></div>
         </template> 
       </div>
     </template> 
     
     <!-- template for teaching assistants -->
-    <template  if="{{role==roles.TA}}">
-      <divid="container"  layout horizontal>
+    <template is="dom-if" if="{{hasRole(role, roles.TA)}}">
+      <divid="container">
         <div id="content"><content></content></div>
-      </div>
-    </template>    
+      
+    </divid="container"></template>    
 
   </template>
   <script>
-    (function() {
-
+    (function () {
       // function roundToTwoDecimals(val){
       //   // round to 2 decimals
       //   // Note the plus sign that drops any "extra" zeroes at the end.
@@ -66,56 +69,62 @@
       //   //from http://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-in-javascript
       //   return  +val.toFixed(2);
       // }
+      Polymer({
+        is: 'asq-rating-item',
 
-      var p = {
-        publish: {
-          /**
-           * The type of the rating item. 
-           * @attribute type
-           * @type string
-           * @default 'stars'
-           */
-          type: {value: "stars", reflect: true},
+        behaviors: [ASQ.asqElementBehavior],
 
-          /**
-           * This attribute identifies the rating item. For rating items that use `input type="radio"`, like `<asq-stars>`, it is needed to group the radio buttons. __Important__: make sure to use unique names for such item otherwise they will be grouped together (Clicking will deselect the others). 
-           * @attribute name
-           * @type string
-           * @default ''
-           */
-          name: {value: '', reflect: true},
-
-          /**
-           * The rating number
-           * @attribute rating
-           * @type number
-           * @default 0
-           */
-          rating: {value: 0, reflect: true},
-
+        properties: {
           /**
            * If true, the user cannot interact with this element.
-           * @attribute disabled
-           * @type boolean
-           * @default false
            */
-          disabled: {value: false, reflect: true}
-
+          disabled: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            reflectToAttribute: true
+          },
+          /**
+           * This attribute identifies the rating item. For rating items that use `input type="radio"`, like `<asq-stars>`, it is needed to group the radio buttons. __Important__: make sure to use unique names for such item otherwise they will be grouped together (Clicking will deselect the others). 
+           */
+          name: {
+            type: String,
+            value: '',
+            notify: true,
+            reflectToAttribute: true
+          },
+          /**
+           * The rating number
+           */
+          rating: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: 'ratingChanged',
+            reflectToAttribute: true
+          },
+          /**
+           * The type of the rating item. 
+           */
+          type: {
+            type: String,
+            value: 'stars',
+            notify: true,
+            reflectToAttribute: true
+          }
         },
-
-        ratingChanged: function(newRating, oldRating) {
+        ratingChanged: function (oldRating, newRating) {
           this.truncatedRating = +oldRating.toFixed(2);
         },
-
         /**
          * The `submit` method will submit the answer to a wrapped 'asq-exercise' instance.
          * Only useful when the `role` is `viewer`.
          * 
          * @method submit
          */
-        submit: function() {
-          if ( this.role === this.roles.VIEWER ) {
-            if(this.type=="stars"){
+        submit: function () {
+          if (this.role === this.roles.VIEWER) {
+            if (this.type == 'stars') {
               return {
                 uid: this.uid,
                 rating: this.rating
@@ -123,12 +132,15 @@
             }
           }
         },
-       
-      }
 
-      ASQ.asqify(p);
-      Polymer('asq-rating-item', p);
-    })()
-    
+        hasRole: function (role, candidate) {
+          return role == candidate;
+        },
+
+        _hasTypeStars: function (type) {
+          return type == 'stars';
+        }
+      });
+    }());
   </script>
-</polymer-element>
+</dom-module>

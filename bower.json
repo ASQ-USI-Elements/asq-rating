@@ -1,7 +1,7 @@
 {
-  "name": "asq-rating",
+  "name": "asq-rating-q",
   "version": "0.1.0",
-  "homepage": "https://github.com/ASQ-USI-Elements/asq-rating",
+  "homepage": "https://github.com/ASQ-USI-Elements/asq-rating-q",
   "authors": [
     "Vasileios Triglianos <triglian@gmail.com>"
   ],
@@ -11,11 +11,13 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "polymer": "Polymer/polymer#^0.5.1",
+    "polymer": "Polymer/polymer#^1.2.3",
     "asq-base": "ASQ-USI-Elements/asq-base#master",
-    "test-fixture": "Polymer/test-fixture#~0.2.0"
+    "test-fixture": "PolymerElements/test-fixture#~1.0.3",
+    "webcomponentsjs": "~0.7.18"
   },
   "devDependencies": {
-    "web-component-tester": "Polymer/web-component-tester#~2.2.6"
+    "web-component-tester": "Polymer/web-component-tester#~3.4.0",
+    "iron-component-page": "polymerElements/iron-component-page#~1.1.0"
   }
 }
