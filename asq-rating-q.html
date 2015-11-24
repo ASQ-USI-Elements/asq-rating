@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../asq-base/asq-base.html">
 <link rel="import" href="./asq-rating-item.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 
 <!--
 `asq-rating-q` is a rating question type used in ASQ. Rating items should be `asq-rating-item` elements.
@@ -15,6 +16,7 @@
     </asq-rating-q>
 
 @element asq-rating-q
+@demo demo/index.html
 @group ASQ Elements
 @blurb `asq-rating` is a rating question type used in ASQ. Rating items should be `asq-rating-item` elements.
 @homepage http://github.com/ASQ-USI-Elements/asq-rating-q
@@ -24,12 +26,24 @@
       :host{
         display: block;
       }
+
+      /* Somehow the paper ripple inside the paper-toggle-button
+      has an absolute positioning, and then takes over the whole page up
+      to the nearest relative parent unless we set the toggle position to `relative` 
+      */
+      #statsToggle{
+        position:relative;
+        @apply(--asq-multi-choice-stats-toggle);
+      }
     </style>
   <template>
 
     <!-- (for now) Keep same when either viewer or presenter -->
     <content select="asq-stem"></content>
-    <content select="asq-rating-item"></content>
+    <template is="dom-if" if="{{hasRole(role, roles.PRESENTER)}}" restamp="true">
+      <paper-toggle-button id="statsToggle" on-iron-change="_onStatsToggleChange"></paper-toggle-button>
+    </template>
+    <content id="ratingItemsContent" select="asq-rating-item"></content>
   </template>
   <script>
     (function () {
@@ -70,6 +84,25 @@
               console.debug('failed to subscribeToEvents');
             }
           }.bind(this));
+        },
+
+        _onStatsToggleChange: function(evt, detail){
+          if(! this.hasRole(this.role, this.roles.PRESENTER)) return;
+
+          this.async(function(){
+            this._showRatingItems(this.$$('#statsToggle').checked);
+          })
+        },
+
+        _showRatingItems: function(val){
+
+          // We have to do this to wait for the ready of lightdom elements.
+          // See details here: https://goo.gl/huOBKi
+          this.async(function() {
+            Polymer.dom(this.$.ratingItemsContent).getDistributedNodes().forEach(function(it){
+              it.style.visibility = (val == false)? 'hidden' : 'visible';
+            })
+          });
         },
 
         onQuestionType: function (evt) {
@@ -174,7 +207,11 @@
             timestamp: new Date(),
             submission: submission
           };
-        }
+        },
+
+        hasRole: function (role, candidate) {
+          return role == candidate;
+        },
       });
     }());
   </script>
