@@ -13,12 +13,12 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.3",
     "asq-base": "ASQ-USI-Elements/asq-base#master",
-    "test-fixture": "PolymerElements/test-fixture#~1.0.3",
-    "webcomponentsjs": "~0.7.18",
-    "paper-toggle-button": "PolymerElements/paper-toggle-button#~1.0.11"
+    "test-fixture": "PolymerElements/test-fixture#^1.0.3",
+    "webcomponentsjs": "^0.7.18",
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.1.1"
   },
   "devDependencies": {
-    "web-component-tester": "Polymer/web-component-tester#~3.4.0",
-    "iron-component-page": "polymerElements/iron-component-page#~1.1.0"
+    "web-component-tester": "Polymer/web-component-tester#^4.2.0",
+    "iron-component-page": "polymerElements/iron-component-page#^1.1.4"
   }
 }
