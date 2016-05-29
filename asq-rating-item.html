@@ -114,7 +114,10 @@
           }
         },
         ratingChanged: function (oldRating, newRating) {
-          this.truncatedRating = +oldRating.toFixed(2);
+          var val = (+oldRating)
+          // 2 decimals but zero should have not decimals
+          val = (val === 0) ? val.toString() : val.toFixed(2);
+          this.truncatedRating = val;
         },
         /**
          * The `submit` method will submit the answer to a wrapped 'asq-exercise' instance.
