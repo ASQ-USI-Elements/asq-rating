@@ -6,7 +6,7 @@ var should = chai.should();
 var expect = chai.expect;
 var cheerio = require('cheerio');
 var Promise = require('bluebird');
-var modulePath = "../../lib/asqRatingPlugin";
+var modulePath = "../../lib/asqRatingQuestionPlugin";
 var fs = require("fs");
 
 describe("asqRatingPlugin.js", function(){
@@ -20,7 +20,7 @@ describe("asqRatingPlugin.js", function(){
       then: then
     });
 
-    this.tagName = "asq-rating";
+    this.tagName = "asq-rating-q";
 
     this.asq = {
       registerHook: function(){},
@@ -57,8 +57,8 @@ describe("asqRatingPlugin.js", function(){
      this.asqRatingPlugin.prototype.processEl.restore();
     });
 
-    it("should call processEl() for all asq-rating elements", function(done){
-      this.asqr.parseHtml(this.simpleHtml)
+    it("should call processEl() for all asq-rating-q elements", function(done){
+      this.asqr.parseHtml({html: this.simpleHtml})
       .then(function(){
         this.asqr.processEl.calledTwice.should.equal(true);
         done();
@@ -69,7 +69,7 @@ describe("asqRatingPlugin.js", function(){
     });
 
     it("should call `model().create()` to persist parsed questions in the db", function(done){
-      this.asqr.parseHtml(this.simpleHtml)
+      this.asqr.parseHtml({html: this.simpleHtml})
       .then(function(result){
         this.create.calledOnce.should.equal(true);
         this.create.calledWith(["res", "res"]).should.equal(true);
@@ -81,9 +81,9 @@ describe("asqRatingPlugin.js", function(){
     });
 
     it("should resolve with the file's html", function(done){
-      this.asqr.parseHtml(this.simpleHtml)
+      this.asqr.parseHtml({html: this.simpleHtml})
       .then(function(result){
-        expect(result).to.equal(this.simpleHtml);
+        expect(result).to.deep.equal({html: this.simpleHtml});
         done();
       }.bind(this))
       .catch(function(err){
