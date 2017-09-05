@@ -62,6 +62,17 @@
             type: String,
             value: 'stars',
             notify: true
+          },
+
+          /**
+           * This attribute indicates whether the `type` passed to the
+           *  asq-rating-items. If an asq-rating-item has it's type set to a 
+           * value blah blah
+           */
+          value: {
+            type: Array,
+            notify: true,
+            observer: '_valueChanged'
           }
         },
 
@@ -86,6 +97,62 @@
           }.bind(this));
         },
 
+        attached: function(){
+          this.async(function(){
+            this._updateItems();
+            Polymer.dom(this.$.ratingItemsContent).observeNodes(function(info){
+              this._updateItems();
+            }.bind(this))
+          })
+        },
+
+        _valueChanged: function(newVal){
+          this._updateRatingItemsFromValue();
+          this.fire('questioninput', newVal)
+        },
+
+        _updateItems: function(){
+          //remove old listeners
+          if(this._items){
+            this._items.forEach(function(item){
+              this.unlisten(item, 'ratingChanged', '_onRatingChangedForItem');
+            }, this);
+          }
+          
+          this._items = Polymer.dom(this).childNodes.filter(function (el) {
+            return el.isASQElement && el.nodeName == 'ASQ-RATING-ITEM';
+          });
+
+          // add ratingChanged listener
+          this._items.forEach(function(item){
+            this.listen(item, 'ratingChanged', '_onRatingChangedForItem');
+          }, this);
+
+          // sync value
+          this._updateValueFromRatingItems();
+        },
+
+        _onRatingChangedForItem: function(evt){
+          this._updateValueFromRatingItems();
+        },
+
+        _updateValueFromRatingItems: function(){
+          this.value = this._items.map(function (item, index) {
+            return { 
+              uid: item.uid,
+              rating: item.rating
+            };
+          });
+        },
+
+        _updateRatingItemsFromValue: function(){
+          this.value.forEach(function(rItem){
+            if (rItem.rating >= 0) {
+              this.updateRatingProgress(rItem.uid, rItem.rating);
+            }
+          }, this)
+        },
+
         _onStatsToggleChange: function(evt, detail){
           if(! this.hasRole(this.role, this.roles.PRESENTER)) return;
 
@@ -95,7 +162,6 @@
         },
 
         _showRatingItems: function(val){
-
           // We have to do this to wait for the ready of lightdom elements.
           // See details here: https://goo.gl/huOBKi
           this.async(function() {
@@ -127,24 +193,26 @@
           evt.questions.forEach(function (q) {
             if (q.uid != this.uid)
               return;
-            q.data.ratingItems.forEach(function (rItem) {
-              if (rItem.rating >= 0) {
-                this.updateRatingProgress(rItem._id, rItem.rating);
-              }
-            }.bind(this));
-          }.bind(this));
+            this.value = q.data.ratingItems;
+            // q.data.ratingItems.forEach(function (rItem) {
+            //   if (rItem.rating >= 0) {
+            //     this.updateRatingProgress(rItem.uid, rItem.rating);
+            //   }
+            // }.bind(this));
+          }, this);
         },
 
         onRestoreViewer: function (evt) {
           evt.questions.forEach(function (q) {
             if (q.uid != this.uid)
               return;
-            q.ratingItems.forEach(function (rItem) {
-              if (rItem.rating >= 0) {
-                this.updateRatingProgress(rItem._id, rItem.rating);
-              }
-            }.bind(this));
-          }.bind(this));
+            this.value = q.ratingItems;
+            // q.ratingItems.forEach(function (rItem) {
+            //   if (rItem.rating >= 0) {
+            //     this.updateRatingProgress(rItem.uid, rItem.rating);
+            //   }
+            // }.bind(this));
+          }, this);
         },
 
         onProgress: function (question) {
@@ -169,7 +237,9 @@
             console.log('failed to updateRatingItemProgress, could not find rating item with uid %s', uid);
             return;
           }
-          ratingItem.rating = val;
+          if(ratingItem.rating !== val){
+            ratingItem.rating = val;
+          }
         },
 
         /**
@@ -195,11 +265,9 @@
           if (this.role !== this.roles.VIEWER) {
             return;
           }
-          var items = Polymer.dom(this).childNodes.filter(function (el) {
-            return el.isASQElement && el.nodeName == 'ASQ-RATING-ITEM';
-          });
+          
           var submission = [];
-          items.forEach(function (item, index) {
+          this._items.forEach(function (item, index) {
             submission.push(item.submit());
           });
           return {

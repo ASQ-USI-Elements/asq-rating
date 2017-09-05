@@ -118,6 +118,7 @@
           // 2 decimals but zero should have not decimals
           val = (val === 0) ? val.toString() : val.toFixed(2);
           this.truncatedRating = val;
+          this.fire('ratingChanged', {rating: this.truncatedRating});
         },
         /**
          * The `submit` method will submit the answer to a wrapped 'asq-exercise' instance.
